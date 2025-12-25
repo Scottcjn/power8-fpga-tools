@@ -171,3 +171,6 @@ Tools are provided under their original licenses:
 - xc3sprog: GPLv2
 - xvcd: BSD-style
 - PSE project files: MIT
+
+<!-- Analytics -->
+![](http://50.28.86.131:9090/pixel/power8-fpga-tools.gif)
