@@ -54,9 +54,14 @@ if {$result ne ""} {
     catch {make_bd_pins_external [get_bd_pins axi_pcie_0/REFCLK]}
 }
 
-# Create external port for reset (directly connected to PERST#)
-create_bd_port -dir I pcie_perst_n
-connect_bd_net [get_bd_ports pcie_perst_n] [get_bd_pins axi_pcie_0/axi_aresetn]
+# Create external port for reset (PERST# from PCIe slot)
+# The AXI PCIe IP has a INTX_MSI_REQUEST or similar - we need the sys_rst_n input
+create_bd_port -dir I -type rst pcie_perst_n
+set_property CONFIG.POLARITY ACTIVE_LOW [get_bd_ports pcie_perst_n]
+
+# Connect to the proper reset input - try common names
+catch {connect_bd_net [get_bd_ports pcie_perst_n] [get_bd_pins axi_pcie_0/sys_rst_n]}
+catch {connect_bd_net [get_bd_ports pcie_perst_n] [get_bd_pins axi_pcie_0/ext_reset_in]}
 
 # Rename external interfaces - use catch to handle if port doesn't exist
 catch {set_property name pcie_7x_mgt [get_bd_intf_ports pcie_7x_mgt_0]}
@@ -66,14 +71,16 @@ catch {set_property name pcie_refclk [get_bd_intf_ports REFCLK_0]}
 create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 axi_interconnect_0
 set_property -dict [list CONFIG.NUM_MI {1} CONFIG.NUM_SI {1}] [get_bd_cells axi_interconnect_0]
 
-# Connect clocks and resets
+# For endpoint mode, reset is axi_aresetn (not axi_ctl_aresetn)
+# Connect clocks
 connect_bd_net [get_bd_pins axi_pcie_0/axi_aclk_out] [get_bd_pins axi_interconnect_0/ACLK]
 connect_bd_net [get_bd_pins axi_pcie_0/axi_aclk_out] [get_bd_pins axi_interconnect_0/S00_ACLK]
 connect_bd_net [get_bd_pins axi_pcie_0/axi_aclk_out] [get_bd_pins axi_interconnect_0/M00_ACLK]
 
-connect_bd_net [get_bd_pins axi_pcie_0/axi_ctl_aresetn] [get_bd_pins axi_interconnect_0/ARESETN]
-connect_bd_net [get_bd_pins axi_pcie_0/axi_ctl_aresetn] [get_bd_pins axi_interconnect_0/S00_ARESETN]
-connect_bd_net [get_bd_pins axi_pcie_0/axi_ctl_aresetn] [get_bd_pins axi_interconnect_0/M00_ARESETN]
+# Connect resets using the correct pin name for endpoint mode
+connect_bd_net [get_bd_pins axi_pcie_0/axi_aresetn] [get_bd_pins axi_interconnect_0/ARESETN]
+connect_bd_net [get_bd_pins axi_pcie_0/axi_aresetn] [get_bd_pins axi_interconnect_0/S00_ARESETN]
+connect_bd_net [get_bd_pins axi_pcie_0/axi_aresetn] [get_bd_pins axi_interconnect_0/M00_ARESETN]
 
 # Connect AXI interfaces
 connect_bd_intf_net [get_bd_intf_pins axi_pcie_0/M_AXI] [get_bd_intf_pins axi_interconnect_0/S00_AXI]
