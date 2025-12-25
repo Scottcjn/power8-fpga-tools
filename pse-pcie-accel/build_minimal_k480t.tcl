@@ -24,17 +24,29 @@ close $fp
 
 add_files "$project_dir/$project_name/minimal.v"
 
-# Critical bitstream options for forcing startup
+# Critical bitstream options for HPC K480T board
 set xdc {
-# Standard config
+# Standard config - HPC board uses 2.5V for config bank
 set_property BITSTREAM.CONFIG.SPI_BUSWIDTH 4 [current_design]
 set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design]
-set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
-set_property CONFIG_VOLTAGE 3.3 [current_design]
+# Disable compression for debugging
+set_property BITSTREAM.GENERAL.COMPRESS FALSE [current_design]
+set_property CONFIG_VOLTAGE 2.5 [current_design]
 set_property CFGBVS VCCO [current_design]
 
 # CRITICAL: Force DONE pin to be actively driven (not just pull-up)
 set_property BITSTREAM.CONFIG.DRIVEDONE YES [current_design]
+
+# Startup clock - use JTAG clock for JTAG programming
+set_property BITSTREAM.STARTUP.STARTUPCLK JTAGCLK [current_design]
+set_property BITSTREAM.CONFIG.CONFIGFALLBACK DISABLE [current_design]
+
+# Allow configuration to proceed even without DONE acknowledge
+set_property BITSTREAM.STARTUP.DONE_PIPE NO [current_design]
+set_property BITSTREAM.STARTUP.GTS_CYCLE 1 [current_design]
+set_property BITSTREAM.STARTUP.GWE_CYCLE 2 [current_design]
+set_property BITSTREAM.STARTUP.LCK_CYCLE NOWAIT [current_design]
+set_property BITSTREAM.STARTUP.DONE_CYCLE 3 [current_design]
 
 # Set unused pins to pull-down to avoid floating inputs
 set_property BITSTREAM.CONFIG.UNUSEDPIN PULLDOWN [current_design]
