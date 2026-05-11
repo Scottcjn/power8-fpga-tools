@@ -78,6 +78,3 @@ https://www.mikrocontroller.net/topic/142358?page=single
 
 Open-source firmware for USB JTAG:
 https://github.com/mithro/ixo-usb-jtag
-
-An open-source USB JTAG adapter:
-https://www.geek-share.com/detail/2395472121.html
