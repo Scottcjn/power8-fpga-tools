@@ -9,7 +9,7 @@ linux computer.  The linux drivers provided by Xilinx are very old (as old
 as ISE), so they don't work on my computer.
 
 There is http://www.rmdir.de/~michael/xilinx/ but I was not able to run it
-(althought I was in the past).
+(although I was in the past).
 
 How to use it ?
 ---------------
@@ -55,7 +55,7 @@ xilinx_xvc host=HOST:2542 disableversioncheck=true
 ```
 
 
-The procotol is documented on https://github.com/Xilinx/XilinxVirtualCable
+The protocol is documented on https://github.com/Xilinx/XilinxVirtualCable
 
 
 Copyright License
